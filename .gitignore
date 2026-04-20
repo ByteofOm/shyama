@@ -1,0 +1,47 @@
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+
+# Xcode
+*.xcodeproj/
+!*.xcodeproj/project.pbxproj
+!*.xcodeproj/xcshareddata/
+!*.xcodeproj/project.xcworkspace/
+*.xcworkspace/
+!*.xcworkspace/contents.xcworkspacedata
+xcuserdata/
+DerivedData/
+*.hmap
+*.ipa
+*.xcarchive
+*.xcbuilddata
+
+# Swift Package Manager
+.build/
+.swiftpm/
+
+# CocoaPods
+Pods/
+Podfile.lock
+
+# Carthage
+Carthage/Build/
+
+# App secrets
+*.p8
+*.p12
+*.mobileprovision
+AuthKey_*.p8
+
+# Fonts — download separately; do not commit binaries
+ios/Shyama/Resources/Fonts/*.ttf
+ios/Shyama/Resources/Fonts/*.otf
+
+# Build artifacts
+*.o
+*.d
+*.module
+*.swp
+*.lock
