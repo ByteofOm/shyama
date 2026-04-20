@@ -1,23 +1,27 @@
 import SwiftUI
 
 struct ProfileView: View {
-    var body: some View {
-        ZStack {
-            Color.canvas.ignoresSafeArea()
+    @State private var showEditProfile = false
+    @State private var showRitual = false
+    @State private var showPrivacy = false
+    @State private var showNotifications = false
 
-            ScrollView(showsIndicators: false) {
-                VStack(alignment: .leading, spacing: 0) {
-                    profileHeader
-                    statsRow
-                    passportCard
-                    savedSection
-                    settingsSection
-                    Spacer().frame(height: 32)
-                }
-                .padding(.horizontal, 22)
+    var body: some View {
+        ScrollView(showsIndicators: false) {
+            VStack(alignment: .leading, spacing: 0) {
+                profileHeader
+                statsRow
+                passportCard
+                savedSection
+                settingsSection
+                Spacer().frame(height: 40)
             }
+            .padding(.horizontal, 22)
         }
-        .preferredColorScheme(.dark)
+        .background(Color.canvas.ignoresSafeArea())
+        .sheet(isPresented: $showEditProfile) { editProfileSheet }
+        .sheet(isPresented: $showPrivacy) { privacySheet }
+        .sheet(isPresented: $showNotifications) { notificationsSheet }
     }
 
     // MARK: - Header
@@ -28,17 +32,17 @@ struct ProfileView: View {
                 Circle()
                     .fill(LinearGradient.amberGlow)
                     .frame(width: 72, height: 72)
-                Text("A")
+                Text("R")
                     .font(.system(size: 28, weight: .bold, design: .serif))
                     .italic()
-                    .foregroundStyle(Color.canvas)
+                    .foregroundStyle(Color.gradientStart)
             }
 
             VStack(alignment: .leading, spacing: 4) {
-                Text("Amina K.")
+                Text("Ruby Mendenhall")
                     .font(Font.Shyama.displayMedium)
                     .foregroundStyle(Color.ink)
-                Text("4c · cocoa · sensitive")
+                Text("4C hair · dry skin · sensitive")
                     .font(.system(size: 12))
                     .foregroundStyle(Color.inkMuted)
                 Text("Sis since 2024")
@@ -62,6 +66,7 @@ struct ProfileView: View {
             statCell(value: "23", label: "Saved")
             statCell(value: "8", label: "Ritual")
         }
+        .padding(.bottom, 24)
     }
 
     private func statCell(value: String, label: String) -> some View {
@@ -79,59 +84,56 @@ struct ProfileView: View {
         .background(Color.surface, in: RoundedRectangle(cornerRadius: 16))
     }
 
-    // MARK: - Skin Passport card
+    // MARK: - Skin Passport
 
     private var passportCard: some View {
-        VStack(alignment: .leading, spacing: 0) {
-            ZStack {
-                RoundedRectangle(cornerRadius: 20)
-                    .fill(LinearGradient(
-                        colors: [Color(hex: "3C1A2E"), Color(hex: "E8A54B")],
-                        startPoint: .topLeading,
-                        endPoint: .bottomTrailing
-                    ))
+        ZStack {
+            RoundedRectangle(cornerRadius: 20)
+                .fill(LinearGradient(
+                    colors: [Color(hex: "3C1A2E"), Color(hex: "C9643F")],
+                    startPoint: .topLeading,
+                    endPoint: .bottomTrailing
+                ))
 
-                // Pattern
-                Canvas { ctx, sz in
-                    for row in stride(from: 0, to: sz.height, by: 36) {
-                        for col in stride(from: 0, to: sz.width, by: 36) {
-                            let cx = col + (row.truncatingRemainder(dividingBy: 72) == 0 ? 18 : 0)
-                            let dot = Path(ellipseIn: CGRect(x: cx, y: row, width: 1.5, height: 1.5))
-                            ctx.fill(dot, with: .color(.white.opacity(0.1)))
-                        }
+            Canvas { ctx, sz in
+                for row in stride(from: 0, to: sz.height, by: 36) {
+                    for col in stride(from: 0, to: sz.width, by: 36) {
+                        let cx = col + (row.truncatingRemainder(dividingBy: 72) == 0 ? 18 : 0)
+                        let dot = Path(ellipseIn: CGRect(x: cx, y: row, width: 1.5, height: 1.5))
+                        ctx.fill(dot, with: .color(.white.opacity(0.09)))
                     }
                 }
-                .clipShape(RoundedRectangle(cornerRadius: 20))
-
-                VStack(alignment: .leading, spacing: 12) {
-                    HStack {
-                        VStack(alignment: .leading, spacing: 2) {
-                            Text("SHYAMA PASSPORT")
-                                .font(.system(size: 9, weight: .semibold))
-                                .tracking(2)
-                                .foregroundStyle(.white.opacity(0.65))
-                            Text("Amina Kamau")
-                                .font(.system(size: 22, weight: .bold, design: .serif))
-                                .italic()
-                                .foregroundStyle(.white)
-                        }
-                        Spacer()
-                        ShyamaLogoMark(color: .white.opacity(0.6), size: 32)
-                    }
-
-                    Divider().overlay(Color.white.opacity(0.2))
-
-                    LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 12) {
-                        passportField(label: "SKIN", value: "Cocoa · sensitive")
-                        passportField(label: "HAIR", value: "Type 4c · locs")
-                        passportField(label: "FOCUS", value: "Hyperpigment.")
-                        passportField(label: "AVOID", value: "Fragrance, SLS")
-                    }
-                }
-                .padding(20)
             }
+            .clipShape(RoundedRectangle(cornerRadius: 20))
+
+            VStack(alignment: .leading, spacing: 14) {
+                HStack {
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("SHYAMA PASSPORT")
+                            .font(.system(size: 9, weight: .semibold))
+                            .tracking(2)
+                            .foregroundStyle(.white.opacity(0.65))
+                        Text("Ruby Mendenhall")
+                            .font(.system(size: 22, weight: .bold, design: .serif))
+                            .italic()
+                            .foregroundStyle(.white)
+                    }
+                    Spacer()
+                    ShyamaLogoMark(color: .white.opacity(0.6), size: 32)
+                }
+
+                Divider().overlay(Color.white.opacity(0.2))
+
+                LazyVGrid(columns: [GridItem(.flexible()), GridItem(.flexible())], spacing: 12) {
+                    passportField(label: "HAIR", value: "Type 4C · coils")
+                    passportField(label: "SKIN", value: "Dry · sensitive")
+                    passportField(label: "FOCUS", value: "Dry skin · barrier")
+                    passportField(label: "AVOID", value: "SLS, alcohol denat., synthetic fragrance, parabens, heavy retinoids")
+                }
+            }
+            .padding(20)
         }
-        .padding(.top, 24)
+        .padding(.bottom, 24)
     }
 
     private func passportField(label: String, value: String) -> some View {
@@ -143,6 +145,7 @@ struct ProfileView: View {
             Text(value)
                 .font(.system(size: 12, weight: .medium))
                 .foregroundStyle(.white)
+                .fixedSize(horizontal: false, vertical: true)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
     }
@@ -151,18 +154,30 @@ struct ProfileView: View {
 
     private var savedSection: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("SAVED")
-                .font(.system(size: 10, weight: .semibold))
-                .tracking(2)
-                .foregroundStyle(Color.inkMuted)
-                .padding(.top, 28)
+            HStack {
+                Text("SAVED")
+                    .font(.system(size: 10, weight: .semibold))
+                    .tracking(2)
+                    .foregroundStyle(Color.inkMuted)
+                Spacer()
+                Button("See all") {}
+                    .font(.system(size: 12, weight: .medium))
+                    .foregroundStyle(Color.accent)
+            }
 
             VStack(spacing: 8) {
-                savedRow(title: "Mahogany Hair Studio", subtitle: "salon · Brooklyn")
-                savedRow(title: "Topicals Faded", subtitle: "product · A")
-                savedRow(title: "Hyperpigmentation guide", subtitle: "article · 3d ago")
+                NavigationLink(destination: Text("Crown & Curl Studio").navigationTitle("Salon Detail")) {
+                    savedRow(title: "Crown & Curl Natural Hair", subtitle: "salon · Champaign · 4C specialist")
+                }
+                NavigationLink(destination: Text("Topicals Faded").navigationTitle("Product Detail")) {
+                    savedRow(title: "Topicals Faded Serum", subtitle: "product · A grade")
+                }
+                NavigationLink(destination: Text("Hyperpigmentation").navigationTitle("Article")) {
+                    savedRow(title: "Dry skin & 4C hair guide", subtitle: "article · 2d ago")
+                }
             }
         }
+        .padding(.bottom, 24)
     }
 
     private func savedRow(title: String, subtitle: String) -> some View {
@@ -170,7 +185,6 @@ struct ProfileView: View {
             RoundedRectangle(cornerRadius: 10)
                 .fill(Color.mist)
                 .frame(width: 32, height: 32)
-
             VStack(alignment: .leading, spacing: 2) {
                 Text(title)
                     .font(.system(size: 13, weight: .semibold))
@@ -179,11 +193,9 @@ struct ProfileView: View {
                     .font(.system(size: 11))
                     .foregroundStyle(Color.inkMuted)
             }
-
             Spacer()
-
             Image(systemName: "chevron.right")
-                .font(.system(size: 12, weight: .medium))
+                .font(.system(size: 11, weight: .medium))
                 .foregroundStyle(Color.inkMuted)
         }
         .padding(.horizontal, 14)
@@ -199,16 +211,19 @@ struct ProfileView: View {
                 .font(.system(size: 10, weight: .semibold))
                 .tracking(2)
                 .foregroundStyle(Color.inkMuted)
-                .padding(.top, 28)
                 .padding(.bottom, 4)
 
-            ForEach([
-                ("Edit skin profile", "update concerns", "person.crop.square"),
-                ("My ritual", "morning & night", "moon.stars"),
-                ("Privacy", "scans stay local", "lock"),
-                ("Notifications", "scan reminders", "bell"),
-            ], id: \.0) { title, subtitle, icon in
-                settingsRow(title: title, subtitle: subtitle, icon: icon)
+            Button { showEditProfile = true } label: {
+                settingsRow(title: "Edit skin profile", subtitle: "dry skin · 4C · sensitive", icon: "person.crop.square")
+            }
+            Button { showRitual = true } label: {
+                settingsRow(title: "My ritual", subtitle: "skincare · mindfulness · nutrition", icon: "moon.stars")
+            }
+            Button { showNotifications = true } label: {
+                settingsRow(title: "Notifications", subtitle: "scan reminders · appointment alerts", icon: "bell")
+            }
+            Button { showPrivacy = true } label: {
+                settingsRow(title: "Privacy", subtitle: "scans stay local · data you control", icon: "lock")
             }
         }
     }
@@ -223,7 +238,6 @@ struct ProfileView: View {
                     .font(.system(size: 15))
                     .foregroundStyle(Color.accent)
             }
-
             VStack(alignment: .leading, spacing: 2) {
                 Text(title)
                     .font(.system(size: 13, weight: .medium))
@@ -232,19 +246,91 @@ struct ProfileView: View {
                     .font(.system(size: 11))
                     .foregroundStyle(Color.inkMuted)
             }
-
             Spacer()
-
             Image(systemName: "chevron.right")
-                .font(.system(size: 12, weight: .medium))
+                .font(.system(size: 11, weight: .medium))
                 .foregroundStyle(Color.inkMuted)
         }
         .padding(.horizontal, 14)
         .padding(.vertical, 10)
         .background(Color.surface, in: RoundedRectangle(cornerRadius: 14))
     }
+
+    // MARK: - Sheets
+
+    private var editProfileSheet: some View {
+        NavigationStack {
+            List {
+                Section("Skin") {
+                    LabeledContent("Type", value: "Dry · sensitive")
+                    LabeledContent("Tone", value: "Deep brown")
+                    LabeledContent("Concern", value: "Dry skin · barrier")
+                }
+                Section("Hair") {
+                    LabeledContent("Texture", value: "Type 4C")
+                    LabeledContent("Style", value: "Coils · natural")
+                }
+                Section("Avoid") {
+                    Text("SLS, alcohol denat., synthetic fragrance, parabens, heavy retinoids without barrier prep")
+                        .font(.system(size: 13))
+                        .foregroundStyle(Color.inkSoft)
+                }
+            }
+            .navigationTitle("Edit Profile")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("Save") { showEditProfile = false }
+                }
+            }
+        }
+    }
+
+    private var privacySheet: some View {
+        NavigationStack {
+            List {
+                Section("Data") {
+                    Label("Scan photos stay on-device", systemImage: "iphone.and.arrow.right")
+                    Label("No cloud upload without consent", systemImage: "cloud.slash")
+                    Label("Delete all data anytime", systemImage: "trash")
+                }
+                Section("Analytics") {
+                    Toggle("Anonymous usage data", isOn: .constant(false))
+                }
+            }
+            .navigationTitle("Privacy")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("Done") { showPrivacy = false }
+                }
+            }
+        }
+    }
+
+    private var notificationsSheet: some View {
+        NavigationStack {
+            List {
+                Section("Reminders") {
+                    Toggle("Daily ritual reminder (8am)", isOn: .constant(true))
+                    Toggle("Scan reminder (every 2 days)", isOn: .constant(true))
+                    Toggle("Appointment suggestions", isOn: .constant(true))
+                }
+                Section("Community") {
+                    Toggle("New replies to my posts", isOn: .constant(false))
+                }
+            }
+            .navigationTitle("Notifications")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .confirmationAction) {
+                    Button("Done") { showNotifications = false }
+                }
+            }
+        }
+    }
 }
 
 #Preview {
-    ProfileView()
+    NavigationStack { ProfileView() }
 }

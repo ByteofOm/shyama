@@ -2,30 +2,28 @@ import SwiftUI
 
 struct IngredientsView: View {
     @State private var searchText = ""
-    @State private var selectedCategory = 0
+    @State private var selectedCategory: ProductCategory = .forMe
 
-    private let categories = ["For me", "Trending", "New", "Melanin-tested"]
-    private let products: [(brand: String, name: String, grade: String, score: String, tags: [String])] = [
-        ("Topicals", "Faded Serum", "A", "94", ["hyperpigmentation", "4c-safe"]),
-        ("Fenty Skin", "Fat Water Toner", "A", "96", ["fragrance-free", "deep skin"]),
-        ("Eadem", "Milk Marvel Serum", "A", "93", ["brightening", "melanin-safe"]),
-        ("Bread Beauty", "Hair Oil", "A−", "88", ["locs-safe", "castor"]),
-        ("The Ordinary", "Niacinamide 10%", "B+", "84", ["barrier", "oily"]),
-    ]
+    private var filteredProducts: [ProductItem] {
+        let byCategory = ProductItem.catalog.filter { $0.tagCategory == selectedCategory }
+        if searchText.isEmpty { return byCategory }
+        return byCategory.filter {
+            $0.name.localizedCaseInsensitiveContains(searchText) ||
+            $0.brand.localizedCaseInsensitiveContains(searchText) ||
+            $0.tags.contains { $0.localizedCaseInsensitiveContains(searchText) } ||
+            $0.ingredients.contains { $0.name.localizedCaseInsensitiveContains(searchText) }
+        }
+    }
 
     var body: some View {
-        ZStack {
-            Color.canvas.ignoresSafeArea()
-
-            VStack(spacing: 0) {
-                hero
-                searchBar
-                categoryChips
-                productList
-            }
+        VStack(spacing: 0) {
+            hero
+            searchBar
+            categoryChips
+            productList
         }
+        .background(Color.canvas.ignoresSafeArea())
         .toolbar(.hidden, for: .navigationBar)
-        .preferredColorScheme(.dark)
     }
 
     // MARK: - Hero
@@ -43,7 +41,7 @@ struct IngredientsView: View {
             )
 
             RadialGradient(
-                colors: [Color.accent.opacity(0.3), .clear],
+                colors: [Color(hex: "E8A54B").opacity(0.28), .clear],
                 center: .topTrailing,
                 startRadius: 0,
                 endRadius: 250
@@ -52,25 +50,25 @@ struct IngredientsView: View {
             VStack(alignment: .leading, spacing: 8) {
                 HStack(spacing: 8) {
                     ShyamaLogoMark(color: .white, size: 20)
-                    Text("SHYAMA")
+                    Text("SHYAMA · PRODUCTS")
                         .font(.system(size: 10, weight: .semibold))
                         .tracking(3)
-                        .foregroundStyle(Color.white.opacity(0.6))
+                        .foregroundStyle(.white.opacity(0.6))
                 }
 
-                Text("Products\nfor your skin.")
+                Text("Graded A–F\nfor your skin.")
                     .font(Font.Shyama.displayMedium)
                     .foregroundStyle(.white)
                     .fixedSize(horizontal: false, vertical: true)
 
-                Text("Graded A–F for melanin-rich skin & textured hair.")
+                Text("Every score built for melanin-rich skin & textured hair.")
                     .font(.system(size: 11))
                     .foregroundStyle(.white.opacity(0.6))
             }
             .padding(.horizontal, 22)
             .padding(.bottom, 24)
         }
-        .frame(height: 220)
+        .frame(height: 210)
     }
 
     // MARK: - Search bar
@@ -81,20 +79,23 @@ struct IngredientsView: View {
                 .font(.system(size: 15))
                 .foregroundStyle(Color.inkMuted)
 
-            TextField("Search ingredient or brand", text: $searchText)
+            TextField("Search ingredient, brand, or concern", text: $searchText)
                 .font(Font.Shyama.body)
                 .foregroundStyle(Color.ink)
                 .autocorrectionDisabled()
                 .textInputAutocapitalization(.never)
 
-            Spacer()
-
-            Button {
-                print("Barcode scanner")
-            } label: {
-                Image(systemName: "barcode.viewfinder")
-                    .font(.system(size: 18))
-                    .foregroundStyle(Color.accent)
+            if !searchText.isEmpty {
+                Button { searchText = "" } label: {
+                    Image(systemName: "xmark.circle.fill")
+                        .foregroundStyle(Color.inkMuted)
+                }
+            } else {
+                Button { } label: {
+                    Image(systemName: "barcode.viewfinder")
+                        .font(.system(size: 18))
+                        .foregroundStyle(Color.accent)
+                }
             }
         }
         .padding(.horizontal, 16)
@@ -105,25 +106,28 @@ struct IngredientsView: View {
         }
     }
 
-    // MARK: - Category chips
+    // MARK: - Category chips (reactive filter)
 
     private var categoryChips: some View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: 8) {
-                ForEach(categories.indices, id: \.self) { i in
+                ForEach(ProductCategory.allCases, id: \.self) { cat in
                     Button {
-                        selectedCategory = i
+                        withAnimation(.spring(response: 0.25)) {
+                            selectedCategory = cat
+                        }
                     } label: {
-                        Text(categories[i])
+                        Text(cat.rawValue)
                             .font(.system(size: 12, weight: .medium))
-                            .foregroundStyle(selectedCategory == i ? Color.canvas : Color.inkSoft)
+                            .foregroundStyle(selectedCategory == cat ? Color(hex: "F4EBDE") : Color.inkSoft)
                             .padding(.horizontal, 14)
                             .padding(.vertical, 8)
                             .background(
-                                selectedCategory == i ? Color.accent : Color.surface,
+                                selectedCategory == cat ? Color.accent : Color.surface,
                                 in: Capsule()
                             )
                     }
+                    .animation(.spring(response: 0.25), value: selectedCategory)
                 }
             }
             .padding(.horizontal, 16)
@@ -136,24 +140,29 @@ struct IngredientsView: View {
 
     private var productList: some View {
         ScrollView(showsIndicators: false) {
-            LazyVStack(spacing: 10) {
-                ForEach(products, id: \.name) { product in
-                    productRow(product)
+            if filteredProducts.isEmpty {
+                emptyState
+            } else {
+                LazyVStack(spacing: 10) {
+                    ForEach(filteredProducts) { product in
+                        NavigationLink(destination: ProductDetailView(product: product)) {
+                            productRow(product)
+                        }
+                    }
+                    Spacer().frame(height: 20)
                 }
-                Spacer().frame(height: 20)
+                .padding(.horizontal, 16)
+                .padding(.top, 4)
             }
-            .padding(.horizontal, 16)
-            .padding(.top, 4)
         }
     }
 
-    private func productRow(_ product: (brand: String, name: String, grade: String, score: String, tags: [String])) -> some View {
+    private func productRow(_ product: ProductItem) -> some View {
         HStack(spacing: 14) {
             RoundedRectangle(cornerRadius: 14)
                 .fill(LinearGradient(
-                    colors: [Color.mist, Color.surface],
-                    startPoint: .topLeading,
-                    endPoint: .bottomTrailing
+                    colors: [Color(hex: "3C1A2E").opacity(0.18), Color(hex: "C9643F").opacity(0.08)],
+                    startPoint: .topLeading, endPoint: .bottomTrailing
                 ))
                 .frame(width: 56, height: 56)
 
@@ -164,14 +173,37 @@ struct IngredientsView: View {
                 Text(product.name)
                     .font(.system(size: 14, weight: .semibold))
                     .foregroundStyle(Color.ink)
-                HStack(spacing: 4) {
-                    ForEach(product.tags.prefix(2), id: \.self) { tag in
-                        Text(tag)
+                    .lineLimit(1)
+
+                // Reactive tags
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 4) {
+                        ForEach(product.tags, id: \.self) { tag in
+                            Button {
+                                withAnimation(.spring(response: 0.25)) {
+                                    searchText = tag
+                                }
+                            } label: {
+                                Text(tag)
+                                    .font(.system(size: 9, weight: .medium))
+                                    .foregroundStyle(Color.inkMuted)
+                                    .padding(.horizontal, 6)
+                                    .padding(.vertical, 2)
+                                    .background(Color.mist, in: RoundedRectangle(cornerRadius: 4))
+                            }
+                        }
+                    }
+                }
+
+                // EDC indicator
+                if product.ingredients.contains(where: { $0.isEDC }) {
+                    HStack(spacing: 4) {
+                        Image(systemName: "exclamationmark.triangle.fill")
+                            .font(.system(size: 9))
+                            .foregroundStyle(Color.warn)
+                        Text("Contains EDCs — tap to learn")
                             .font(.system(size: 9, weight: .medium))
-                            .foregroundStyle(Color.inkMuted)
-                            .padding(.horizontal, 6)
-                            .padding(.vertical, 2)
-                            .background(Color.mist, in: RoundedRectangle(cornerRadius: 4))
+                            .foregroundStyle(Color.warn)
                     }
                 }
             }
@@ -179,8 +211,11 @@ struct IngredientsView: View {
             Spacer()
 
             VStack(spacing: 0) {
-                gradeColor(product.grade)
-                Text(product.score)
+                Text(product.grade)
+                    .font(.system(size: 26, weight: .black, design: .serif))
+                    .italic()
+                    .foregroundStyle(gradeColor(product.grade))
+                Text("\(product.score)")
                     .font(.system(size: 9))
                     .foregroundStyle(Color.inkMuted)
             }
@@ -189,15 +224,30 @@ struct IngredientsView: View {
         .background(Color.surface, in: RoundedRectangle(cornerRadius: 16))
     }
 
-    private func gradeColor(_ grade: String) -> some View {
-        let color: Color = grade.hasPrefix("A") ? .good : grade.hasPrefix("B") ? Color(hex: "8FB57A") : .warn
-        return Text(grade)
-            .font(.system(size: 24, weight: .bold, design: .serif))
-            .italic()
-            .foregroundStyle(color)
+    private var emptyState: some View {
+        VStack(spacing: 16) {
+            Spacer().frame(height: 60)
+            Image(systemName: "sparkles")
+                .font(.system(size: 36))
+                .foregroundStyle(Color.inkMuted)
+            Text("No products match \"\(searchText)\"")
+                .font(Font.Shyama.footnote)
+                .foregroundStyle(Color.inkMuted)
+                .multilineTextAlignment(.center)
+            Spacer()
+        }
+    }
+
+    private func gradeColor(_ grade: String) -> Color {
+        switch grade.prefix(1) {
+        case "A": return .good
+        case "B": return Color(hex: "7AAA68")
+        case "C": return .warn
+        default:  return .bad
+        }
     }
 }
 
 #Preview {
-    IngredientsView()
+    NavigationStack { IngredientsView() }
 }
