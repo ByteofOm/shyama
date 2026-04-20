@@ -1,49 +1,45 @@
 import SwiftUI
 
 struct WelcomeView: View {
-    @State private var goToHome = false
+    @State private var showRootTab = false
 
     var body: some View {
-        NavigationStack {
-            ZStack {
-                Color.canvas.ignoresSafeArea()
+        ZStack {
+            Color.canvas.ignoresSafeArea()
 
+            GeometryReader { geo in
                 VStack(spacing: 0) {
-                    Spacer()
+                    // Position wordmark ~35% from top of screen
+                    Spacer().frame(height: geo.size.height * 0.30)
 
-                    // Wordmark lockup
-                    Text("Shyama")
-                        .font(.custom("Fraunces-Medium", size: 56))
-                        .foregroundStyle(Color.ink)
+                    GlitchWordmark()
+                        .frame(maxWidth: .infinity, alignment: .center)
 
-                    Text("श्यामा")
-                        .font(.custom("MuktaDevanagari-Regular", size: 32))
-                        .foregroundStyle(Color.inkSoft)
-                        .padding(.top, Spacing.xs)
+                    Spacer().frame(height: 32)
 
                     Text("Skincare that sees you.")
-                        .font(.custom("DMSans-Regular", size: 15))
+                        .font(.custom("DMSans-9ptRegular", size: 15))
                         .foregroundStyle(Color.inkSoft)
-                        .padding(.top, Spacing.sm)
+                        .multilineTextAlignment(.center)
+
+                    Spacer().frame(height: 64)
+
+                    GlassCTAButton("Begin") {
+                        showRootTab = true
+                    }
+                    .padding(.horizontal, 32)
 
                     Spacer()
-
-                    SoftButton("Begin", variant: .prominent) {
-                        goToHome = true
-                    }
-                    .padding(.bottom, Spacing.xxl)
                 }
-                .padding(.horizontal, Spacing.xl)
             }
-            .navigationBarHidden(true)
-            .navigationDestination(isPresented: $goToHome) {
-                HomeView()
-            }
+        }
+        .navigationBarHidden(true)
+        .statusBarHidden(false)
+        .fullScreenCover(isPresented: $showRootTab) {
+            RootTabView()
         }
     }
 }
-
-// MARK: - Preview
 
 #Preview {
     WelcomeView()

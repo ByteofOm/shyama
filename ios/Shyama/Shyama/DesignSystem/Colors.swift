@@ -1,15 +1,17 @@
 import SwiftUI
 
 extension Color {
-    // MARK: - Shyama Palette
-    static let canvas      = Color(hex: "F2ECE0")  // warm cream background
-    static let canvasDeep  = Color(hex: "E8DFCE")  // recessed surfaces, inset shadow targets
-    static let ink         = Color(hex: "1A1410")  // primary text, near-black with warmth
-    static let inkSoft     = Color(hex: "5C4A3E")  // secondary text
-    static let terracotta  = Color(hex: "B8502E")  // primary accent — CTA, scan button
-    static let honey       = Color(hex: "D9A441")  // secondary accent — highlights, confidence bars
-    static let forest      = Color(hex: "2E5D4F")  // success, "skin-friendly" indicators
-    static let clay        = Color(hex: "8B4513")  // tertiary, ingredient warnings
+    // MARK: - Shyama Warm Glass Palette
+    static let canvas         = Color(hex: "FAF6F0")  // bone white app background
+    static let surface        = Color(hex: "FFFFFF")  // elevated card surfaces — use sparingly
+    static let mist           = Color(hex: "F2EADD")  // subtle dividers and secondary backgrounds
+    static let ink            = Color(hex: "1F1915")  // primary text — warm near-black
+    static let inkSoft        = Color(hex: "6B5F52")  // secondary text
+    static let inkMuted       = Color(hex: "A39689")  // tertiary text, hints, placeholders
+    static let amber          = Color(hex: "D4A574")  // primary accent — CTAs, active tab tint
+    static let amberDeep      = Color(hex: "B8863D")  // pressed / emphasis variant
+    static let glassHighlight = Color(white: 1.0, opacity: 0.55)
+    static let glassShadow    = Color(red: 0.12, green: 0.09, blue: 0.06, opacity: 0.08)
 
     // MARK: - Hex initializer
     init(hex: String) {
