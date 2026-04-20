@@ -1,17 +1,19 @@
 import SwiftUI
 
 extension Color {
-    // MARK: - Shyama Warm Glass Palette
-    static let canvas         = Color(hex: "FAF6F0")  // bone white app background
-    static let surface        = Color(hex: "FFFFFF")  // elevated card surfaces — use sparingly
-    static let mist           = Color(hex: "F2EADD")  // subtle dividers and secondary backgrounds
-    static let ink            = Color(hex: "1F1915")  // primary text — warm near-black
-    static let inkSoft        = Color(hex: "6B5F52")  // secondary text
-    static let inkMuted       = Color(hex: "A39689")  // tertiary text, hints, placeholders
-    static let amber          = Color(hex: "D4A574")  // primary accent — CTAs, active tab tint
-    static let amberDeep      = Color(hex: "B8863D")  // pressed / emphasis variant
-    static let glassHighlight = Color(white: 1.0, opacity: 0.55)
-    static let glassShadow    = Color(red: 0.12, green: 0.09, blue: 0.06, opacity: 0.08)
+    // MARK: - Shyama Monochrome Palette
+    static let canvas      = Color(hex: "FAFAFA")  // cool off-white app background
+    static let surface     = Color(hex: "FFFFFF")  // pure white elevated cards — rare
+    static let mist        = Color(hex: "F2F2F4")  // subtle dividers, hairlines
+    static let ink         = Color(hex: "0A0A0B")  // near-black primary text
+    static let inkSoft     = Color(hex: "5E5E63")  // secondary text
+    static let inkMuted    = Color(hex: "A1A1A8")  // tertiary text, placeholders, hints
+    static let stroke      = Color(hex: "E5E5EA")  // borders, faint
+
+    // MARK: - Atmospheric Gradient Stops
+    static let gradientStart = Color(hex: "0A0A0B")  // deep near-black — gradient top
+    static let gradientMid   = Color(hex: "1E1B3E")  // deep violet-black — gradient middle
+    static let gradientEnd   = Color(hex: "2B3A6B")  // muted cool blue — gradient bottom
 
     // MARK: - Hex initializer
     init(hex: String) {
@@ -35,4 +37,15 @@ extension Color {
         }
         self.init(.sRGB, red: r, green: g, blue: b, opacity: a)
     }
+}
+
+// MARK: - Shared gradient
+
+extension LinearGradient {
+    /// The one Shyama atmospheric gradient. Used on Welcome background only.
+    static let shyamaAtmosphere = LinearGradient(
+        colors: [.gradientStart, .gradientMid, .gradientEnd],
+        startPoint: .top,
+        endPoint: .bottom
+    )
 }

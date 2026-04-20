@@ -1,7 +1,8 @@
 import SwiftUI
 
-/// Signature animation component: morphs between "Shyama" (Fraunces 40pt) and
-/// "श्यामा" (Mukta 40pt) with a character-by-character scramble at ~30Hz per character.
+/// Signature animation: morphs between "Shyama" (Inter Tight 56pt) and
+/// "श्यामा" (Mukta SemiBold 56pt) with a character-by-character scramble at ~30Hz.
+/// Designed to sit on the dark atmospheric gradient — all text is white.
 struct GlitchWordmark: View {
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var startTime: Date = .now
@@ -16,22 +17,18 @@ struct GlitchWordmark: View {
         return raw + pad
     }()
 
+    // Clean ASCII + script pools — no punctuation or symbols
     private let devanagariPool = [
         "क", "ख", "ग", "घ", "च", "ज", "ट", "त", "द", "न",
         "प", "ब", "म", "य", "र", "ल", "व", "श", "ह", "ड"
     ]
     private let latinPool = [
-        "A","B","C","D","E","F","G","H","I","J",
-        "K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z"
+        "a","b","c","d","e","f","g","h","i","j",
+        "k","l","m","n","o","p","q","r","s","t","u","v","w","x","y","z"
     ]
 
-    private let holdDuration: Double = 2.5
-    private let scrambleDuration: Double = 0.4
-
-    // Font.Shyama.devanagariAccent scaled up to 40pt for wordmark display
-    private var devanagariLarge: Font {
-        .custom("Mukta-SemiBold", size: 40, relativeTo: .largeTitle)
-    }
+    private let holdDuration: Double    = 4.0
+    private let scrambleDuration: Double = 0.6
 
     var body: some View {
         Group {
@@ -55,12 +52,12 @@ struct GlitchWordmark: View {
 
     private var reducedBody: some View {
         Text(showingEnglish ? "Shyama" : "श्यामा")
-            .font(showingEnglish ? Font.Shyama.displayLarge : devanagariLarge)
-            .foregroundStyle(Color.ink)
+            .font(showingEnglish ? Font.Shyama.displayXL : Font.Shyama.devanagariDisplay)
+            .foregroundStyle(Color.white)
             .animation(.easeInOut(duration: 0.5), value: showingEnglish)
             .task {
                 while !Task.isCancelled {
-                    try? await Task.sleep(for: .seconds(3.5))
+                    try? await Task.sleep(for: .seconds(holdDuration + scrambleDuration))
                     withAnimation { showingEnglish.toggle() }
                 }
             }
@@ -71,21 +68,21 @@ struct GlitchWordmark: View {
     @ViewBuilder
     private func animatedBody(t: Double, date: Date) -> some View {
         if t < holdDuration {
-            wordRow(chars: englishChars, font: Font.Shyama.displayLarge)
+            wordRow(chars: englishChars, font: Font.Shyama.displayXL)
         } else if t < holdDuration + scrambleDuration {
             scrambleRow(
                 from: englishChars, to: devanagariChars,
-                fromFont: Font.Shyama.displayLarge, toFont: devanagariLarge,
+                fromFont: Font.Shyama.displayXL, toFont: Font.Shyama.devanagariDisplay,
                 pool: devanagariPool,
                 progress: (t - holdDuration) / scrambleDuration,
                 date: date
             )
         } else if t < 2 * holdDuration + scrambleDuration {
-            wordRow(chars: devanagariChars, font: devanagariLarge)
+            wordRow(chars: devanagariChars, font: Font.Shyama.devanagariDisplay)
         } else {
             scrambleRow(
                 from: devanagariChars, to: englishChars,
-                fromFont: devanagariLarge, toFont: Font.Shyama.displayLarge,
+                fromFont: Font.Shyama.devanagariDisplay, toFont: Font.Shyama.displayXL,
                 pool: latinPool,
                 progress: (t - (2 * holdDuration + scrambleDuration)) / scrambleDuration,
                 date: date
@@ -100,7 +97,7 @@ struct GlitchWordmark: View {
             ForEach(Array(chars.enumerated()), id: \.offset) { _, char in
                 Text(char)
                     .font(font)
-                    .foregroundStyle(Color.ink)
+                    .foregroundStyle(Color.white)
             }
         }
     }
@@ -122,7 +119,6 @@ struct GlitchWordmark: View {
         }
     }
 
-    // Resolves a single character's display state outside a @ViewBuilder context.
     private func charView(
         i: Int, n: Int,
         from: [String], to: [String],
@@ -146,13 +142,13 @@ struct GlitchWordmark: View {
             let idx  = ((tick % pool.count) + pool.count) % pool.count
             text    = pool[idx]
             font    = fromFont
-            opacity = 0.6
-            jitter  = CGFloat(sin(date.timeIntervalSinceReferenceDate * 23 + Double(i) * 3.7))
+            opacity = 0.85
+            jitter  = CGFloat(sin(date.timeIntervalSinceReferenceDate * 23 + Double(i) * 3.7)) * 0.5
         }
 
         return Text(text)
             .font(font)
-            .foregroundStyle(Color.ink)
+            .foregroundStyle(Color.white)
             .opacity(opacity)
             .offset(x: jitter)
     }
@@ -161,5 +157,5 @@ struct GlitchWordmark: View {
 #Preview {
     GlitchWordmark()
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(Color.canvas)
+        .background(LinearGradient.shyamaAtmosphere)
 }

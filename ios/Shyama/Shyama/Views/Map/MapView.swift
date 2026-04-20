@@ -28,7 +28,7 @@ struct MapView: View {
                 .ignoresSafeArea()
 
                 Text("Find BIPOC beauty & care")
-                    .font(.custom("DMSans-9ptRegular", size: 14).weight(.medium))
+                    .font(Font.Shyama.footnote.weight(.medium))
                     .foregroundStyle(Color.ink)
                     .padding(.horizontal, 16)
                     .padding(.vertical, 8)

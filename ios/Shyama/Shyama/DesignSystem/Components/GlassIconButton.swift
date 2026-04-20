@@ -3,8 +3,8 @@ import SwiftUI
 /// Circular 44×44pt glass icon button for secondary actions (close, back, camera flip).
 struct GlassIconButton: View {
     let icon: String
-    let action: () -> Void
     var accessibilityLabel: String = ""
+    let action: () -> Void
 
     var body: some View {
         Button(action: action) {

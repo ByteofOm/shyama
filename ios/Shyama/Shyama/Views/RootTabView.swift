@@ -18,7 +18,7 @@ struct RootTabView: View {
                     Label("Map", systemImage: "map")
                 }
         }
-        .tint(Color.amber)
+        .tint(Color.ink)
     }
 }
 

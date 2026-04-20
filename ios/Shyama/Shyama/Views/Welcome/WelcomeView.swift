@@ -5,42 +5,39 @@ struct WelcomeView: View {
 
     var body: some View {
         ZStack {
-            Color.canvas.ignoresSafeArea()
+            LinearGradient.shyamaAtmosphere
+                .ignoresSafeArea()
 
             GeometryReader { geo in
                 VStack(spacing: 0) {
-                    // Position wordmark ~35% from top of screen
-                    Spacer().frame(height: geo.size.height * 0.30)
+                    Spacer().frame(height: geo.size.height * 0.38)
 
                     GlitchWordmark()
                         .frame(maxWidth: .infinity, alignment: .center)
 
-                    Spacer().frame(height: 32)
+                    Spacer().frame(height: 24)
 
                     Text("Skincare that sees you.")
-                        .font(.custom("DMSans-9ptRegular", size: 15))
-                        .foregroundStyle(Color.inkSoft)
+                        .font(Font.Shyama.callout)
+                        .foregroundStyle(Color.white.opacity(0.7))
                         .multilineTextAlignment(.center)
 
-                    Spacer().frame(height: 64)
+                    Spacer()
 
-                    GlassCTAButton("Begin") {
+                    GlassCTAButton("Begin", variant: .secondary) {
                         showRootTab = true
                     }
                     .padding(.horizontal, 32)
-
-                    Spacer()
+                    .padding(.bottom, 48)
                 }
             }
         }
-        .navigationBarHidden(true)
         .statusBarHidden(false)
+        .preferredColorScheme(.dark)
         .fullScreenCover(isPresented: $showRootTab) {
             RootTabView()
         }
     }
 }
 
-#Preview {
-    WelcomeView()
-}
+#Preview { WelcomeView() }

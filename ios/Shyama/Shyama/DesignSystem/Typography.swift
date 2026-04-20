@@ -4,41 +4,41 @@ import CoreText
 // Call once at app launch — registers bundled TTF files so Font.custom resolves correctly.
 func registerFonts() {
     let filenames = [
-        "Fraunces-VariableFont_SOFT,WONK,opsz,wght",
-        "DMSans-VariableFont_opsz,wght",
+        "InterTight-VariableFont_wght",
         "Mukta-Regular",
         "Mukta-SemiBold"
     ]
     for name in filenames {
         guard let url = Bundle.main.url(forResource: name, withExtension: "ttf") else {
-            print("⚠️ Font file not found in bundle: \(name).ttf")
+            print("ℹ️ Font not bundled: \(name).ttf")
             continue
         }
         var error: Unmanaged<CFError>?
         let ok = CTFontManagerRegisterFontsForURL(url as CFURL, .process, &error)
         if !ok {
-            // Already registered on subsequent launches — not a real error
-            let code = error?.takeRetainedValue().localizedDescription ?? "unknown"
-            print("ℹ️ Font \(name): \(code)")
+            print("ℹ️ Font \(name): already registered or failed")
         }
     }
 }
 
-// Semantic type scale. Use as Font.Shyama.displayLarge etc.
-// Nested under Font.Shyama to avoid shadowing SwiftUI's built-in Font.body / .headline / .caption.
+// Semantic type scale. Use as Font.Shyama.displayXL etc.
 extension Font {
     enum Shyama {
-        /// Fraunces 40pt — use .fontWeight(.medium) at call site for weight 500
-        static let displayLarge: Font     = .custom("Fraunces-9ptBlack",     size: 40, relativeTo: .largeTitle)
-        /// Fraunces 28pt
-        static let displayMedium: Font    = .custom("Fraunces-9ptBlack",     size: 28, relativeTo: .title)
-        /// DM Sans 20pt — use .fontWeight(.semibold) at call site
-        static let headline: Font         = .custom("DMSans-9ptRegular",     size: 20, relativeTo: .headline)
-        /// DM Sans 16pt
-        static let body: Font             = .custom("DMSans-9ptRegular",     size: 16, relativeTo: .body)
-        /// DM Sans 13pt
-        static let caption: Font          = .custom("DMSans-9ptRegular",     size: 13, relativeTo: .caption)
-        /// Mukta 24pt — Devanagari wordmark "श्यामा" and accent phrases
-        static let devanagariAccent: Font = .custom("Mukta-SemiBold",        size: 24, relativeTo: .title2)
+        /// Inter Tight 56pt — hero display (Welcome wordmark)
+        static let displayXL: Font = .custom("InterTight-Regular", size: 56, relativeTo: .largeTitle)
+        /// Inter Tight 40pt — major screen headlines
+        static let displayLarge: Font = .custom("InterTight-Regular", size: 40, relativeTo: .largeTitle)
+        /// Inter Tight 28pt — section headlines
+        static let displayMedium: Font = .custom("InterTight-Regular", size: 28, relativeTo: .title)
+
+        /// SF Pro — UI text with proper Dynamic Type support.
+        static let headline: Font = .system(.headline, design: .default, weight: .semibold)
+        static let body: Font = .system(.body, design: .default, weight: .regular)
+        static let callout: Font = .system(.callout, design: .default, weight: .regular)
+        static let caption: Font = .system(.caption, design: .default, weight: .regular)
+        static let footnote: Font = .system(.footnote, design: .default, weight: .regular)
+
+        /// Mukta SemiBold 56pt — for "श्यामा" in GlitchWordmark only.
+        static let devanagariDisplay: Font = .custom("Mukta-SemiBold", size: 56, relativeTo: .largeTitle)
     }
 }

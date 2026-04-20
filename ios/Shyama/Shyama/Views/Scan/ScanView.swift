@@ -16,13 +16,13 @@ struct ScanView: View {
                     Spacer().frame(height: 24)
 
                     Text("Scan your skin")
-                        .font(.custom("Fraunces-9ptBlack", size: 28).weight(.medium))
+                        .font(Font.Shyama.displayMedium)
                         .foregroundStyle(Color.ink)
 
                     Spacer().frame(height: 16)
 
                     Text("Get possible matches and skin tips for conditions commonly seen on melanated skin. Educational — always consult a dermatologist.")
-                        .font(.custom("DMSans-9ptRegular", size: 15))
+                        .font(Font.Shyama.callout)
                         .foregroundStyle(Color.inkSoft)
                         .multilineTextAlignment(.center)
                         .frame(maxWidth: 280)
