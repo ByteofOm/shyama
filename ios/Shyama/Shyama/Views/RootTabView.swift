@@ -3,22 +3,33 @@ import SwiftUI
 struct RootTabView: View {
     var body: some View {
         TabView {
-            ScanView()
+            HomeView()
                 .tabItem {
-                    Label("Scan", systemImage: "camera.viewfinder")
-                }
-
-            IngredientsView()
-                .tabItem {
-                    Label("Ingredients", systemImage: "list.bullet.rectangle")
+                    Label("Home", systemImage: "house")
                 }
 
             MapView()
                 .tabItem {
-                    Label("Map", systemImage: "map")
+                    Label("Map", systemImage: "mappin.and.ellipse")
+                }
+
+            ScanView()
+                .tabItem {
+                    Label("Scan", systemImage: "viewfinder.circle")
+                }
+
+            IngredientsView()
+                .tabItem {
+                    Label("Products", systemImage: "bag")
+                }
+
+            ProfileView()
+                .tabItem {
+                    Label("Profile", systemImage: "person")
                 }
         }
-        .tint(Color.ink)
+        .tint(Color.accent)
+        .preferredColorScheme(.dark)
     }
 }
 

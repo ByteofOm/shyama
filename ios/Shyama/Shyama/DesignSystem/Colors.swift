@@ -1,19 +1,28 @@
 import SwiftUI
 
 extension Color {
-    // MARK: - Shyama Monochrome Palette
-    static let canvas      = Color(hex: "FAFAFA")  // cool off-white app background
-    static let surface     = Color(hex: "FFFFFF")  // pure white elevated cards — rare
-    static let mist        = Color(hex: "F2F2F4")  // subtle dividers, hairlines
-    static let ink         = Color(hex: "0A0A0B")  // near-black primary text
-    static let inkSoft     = Color(hex: "5E5E63")  // secondary text
-    static let inkMuted    = Color(hex: "A1A1A8")  // tertiary text, placeholders, hints
-    static let stroke      = Color(hex: "E5E5EA")  // borders, faint
+    // MARK: - Shyama Obsidian Palette (dark-first, warm)
+    static let canvas      = Color(hex: "14100F")   // deep obsidian background
+    static let surface     = Color(hex: "221C1A")   // elevated surfaces
+    static let mist        = Color(hex: "1C1715")   // subtle secondary bg
+    static let ink         = Color(hex: "F2E6D4")   // warm cream — primary text
+    static let inkSoft     = Color(hex: "D8C4AA")   // secondary text
+    static let inkMuted    = Color(hex: "8A7A68")   // tertiary / placeholder
+    static let stroke      = Color(hex: "3A302A")   // borders, hairlines
+
+    // MARK: - Brand Accents
+    static let accent      = Color(hex: "E8A54B")   // warm amber — primary CTA
+    static let primary     = Color(hex: "C7A984")   // shea — secondary accent
+
+    // MARK: - Semantic
+    static let good        = Color(hex: "8FB57A")   // grade A/B
+    static let warn        = Color(hex: "E8A54B")   // grade C / caution
+    static let bad         = Color(hex: "D96B4F")   // grade D/F / alert
 
     // MARK: - Atmospheric Gradient Stops
-    static let gradientStart = Color(hex: "0A0A0B")  // deep near-black — gradient top
-    static let gradientMid   = Color(hex: "1E1B3E")  // deep violet-black — gradient middle
-    static let gradientEnd   = Color(hex: "2B3A6B")  // muted cool blue — gradient bottom
+    static let gradientStart = Color(hex: "14100F")  // obsidian
+    static let gradientMid   = Color(hex: "1C1715")  // warm dark
+    static let gradientEnd   = Color(hex: "221C1A")  // warm surface
 
     // MARK: - Hex initializer
     init(hex: String) {
@@ -39,13 +48,18 @@ extension Color {
     }
 }
 
-// MARK: - Shared gradient
+// MARK: - Shared gradients
 
 extension LinearGradient {
-    /// The one Shyama atmospheric gradient. Used on Welcome background only.
     static let shyamaAtmosphere = LinearGradient(
         colors: [.gradientStart, .gradientMid, .gradientEnd],
         startPoint: .top,
         endPoint: .bottom
+    )
+
+    static let amberGlow = LinearGradient(
+        colors: [Color(hex: "E8A54B"), Color(hex: "C7A984")],
+        startPoint: .topLeading,
+        endPoint: .bottomTrailing
     )
 }

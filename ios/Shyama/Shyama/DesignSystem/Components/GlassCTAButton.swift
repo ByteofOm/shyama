@@ -42,8 +42,8 @@ struct GlassCTAButton: View {
     private var primaryButton: some View {
         Button(action: action) {
             label
-                .foregroundStyle(Color.white)
-                .background(Color.ink, in: .capsule)
+                .foregroundStyle(Color.canvas)
+                .background(Color.accent, in: .capsule)
         }
         .buttonStyle(PressScaleStyle())
         .accessibilityLabel(title)

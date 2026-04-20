@@ -7,9 +7,18 @@ struct WelcomeView: View {
 
     var body: some View {
         ZStack {
-            // Background atmosphere
+            // Background
             LinearGradient.shyamaAtmosphere
                 .ignoresSafeArea()
+
+            // Warm ambient glow from bottom
+            RadialGradient(
+                colors: [Color(hex: "C9643F").opacity(0.18), .clear],
+                center: .bottom,
+                startRadius: 0,
+                endRadius: 500
+            )
+            .ignoresSafeArea()
 
             // Dot grid texture
             Canvas { ctx, sz in
@@ -21,32 +30,32 @@ struct WelcomeView: View {
                         let x = CGFloat(col) * spacing
                         let y = CGFloat(row) * spacing
                         let dot = Path(ellipseIn: CGRect(x: x - 0.5, y: y - 0.5, width: 1, height: 1))
-                        ctx.fill(dot, with: .color(.white.opacity(0.055)))
+                        ctx.fill(dot, with: .color(.white.opacity(0.05)))
                     }
                 }
             }
             .ignoresSafeArea()
 
-            // Animated rings behind wordmark area
             GeometryReader { geo in
                 let cx = geo.size.width / 2
-                let cy = geo.size.height * 0.38
+                let cy = geo.size.height * 0.36
 
+                // Pulsing rings
                 Circle()
-                    .stroke(Color.white.opacity(0.07), lineWidth: 0.75)
-                    .frame(width: 260, height: 260)
+                    .stroke(Color.accent.opacity(0.08), lineWidth: 1)
+                    .frame(width: 280, height: 280)
                     .scaleEffect(ringPulse)
                     .position(x: cx, y: cy)
 
                 Circle()
-                    .stroke(Color.white.opacity(0.04), lineWidth: 0.75)
-                    .frame(width: 380, height: 380)
+                    .stroke(Color.accent.opacity(0.04), lineWidth: 1)
+                    .frame(width: 420, height: 420)
                     .scaleEffect(ringPulse * 1.04)
                     .position(x: cx, y: cy)
 
-                // Radial glow behind wordmark
+                // Amber radial glow
                 RadialGradient(
-                    colors: [Color(hex: "2A3070").opacity(0.55), .clear],
+                    colors: [Color(hex: "E8A54B").opacity(0.2), .clear],
                     center: .center,
                     startRadius: 0,
                     endRadius: 160
@@ -58,31 +67,38 @@ struct WelcomeView: View {
 
             GeometryReader { geo in
                 VStack(spacing: 0) {
-                    Spacer().frame(height: geo.size.height * 0.28)
+                    Spacer().frame(height: geo.size.height * 0.26)
 
-                    // Logo mark above wordmark
-                    ShyamaLogoMark(color: .white, size: 32)
+                    // Triple moon logo mark
+                    ShyamaLogoMark(color: Color.accent, size: 48)
                         .frame(maxWidth: .infinity, alignment: .center)
 
-                    Spacer().frame(height: 14)
+                    Spacer().frame(height: 20)
 
+                    // Wordmark
                     GlitchWordmark()
                         .frame(maxWidth: .infinity, alignment: .center)
 
-                    Spacer().frame(height: 24)
+                    Spacer().frame(height: 20)
 
                     Text("Skincare that sees you.")
                         .font(Font.Shyama.callout)
-                        .foregroundStyle(Color.white.opacity(0.7))
+                        .foregroundStyle(Color.inkSoft)
                         .multilineTextAlignment(.center)
 
                     Spacer()
 
-                    GlassCTAButton("Begin", variant: .secondary) {
+                    GlassCTAButton("Begin your ritual", variant: .secondary) {
                         showRootTab = true
                     }
                     .padding(.horizontal, 32)
-                    .padding(.bottom, 48)
+
+                    Text("Already here? Sign in")
+                        .font(.system(size: 11))
+                        .foregroundStyle(Color.inkMuted)
+                        .padding(.top, 12)
+
+                    Spacer().frame(height: 48)
                 }
             }
         }
@@ -90,10 +106,7 @@ struct WelcomeView: View {
         .preferredColorScheme(.dark)
         .onAppear {
             guard !reduceMotion else { return }
-            withAnimation(
-                .easeInOut(duration: 4.0)
-                .repeatForever(autoreverses: true)
-            ) {
+            withAnimation(.easeInOut(duration: 4.0).repeatForever(autoreverses: true)) {
                 ringPulse = 1.08
             }
         }
